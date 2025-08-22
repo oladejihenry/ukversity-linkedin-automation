@@ -22,9 +22,9 @@ export default function LoginPage() {
 
       <LoginForm />
 
-      <div className="text-muted-foreground text-center text-sm">
+      {/* <div className="text-muted-foreground text-center text-sm">
         <p>Demo: Use any email and password to sign in</p>
-      </div>
+      </div> */}
     </div>
   )
 }
