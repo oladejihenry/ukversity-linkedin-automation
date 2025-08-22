@@ -6,6 +6,7 @@ export interface Article {
   published_at?: Date
   updated_at?: Date
   scheduled_for?: Date
+  deleted_at?: Date
   video_url?: string
   video_status?: 'pending' | 'processing' | 'completed' | 'failed'
 }

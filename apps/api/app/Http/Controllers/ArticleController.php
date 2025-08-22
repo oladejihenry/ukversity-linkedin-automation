@@ -27,7 +27,13 @@ class ArticleController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return ArticleResource::collection($articles);
+        $deletedCount = Article::onlyTrashed()->where('user_id', $user->id)->count();
+
+        return ArticleResource::collection($articles)->additional([
+            'meta' => [
+                'deleted_count' => $deletedCount
+            ]
+        ]);
     }
 
     /**

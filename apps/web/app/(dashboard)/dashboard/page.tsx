@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const articles = await getArticles()
+  console.log(articles)
   if (!articles.data) {
     notFound()
   }
@@ -59,7 +60,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-500">
-                {articles.data.filter((a: Article) => a.status === 'draft').length}
+                {articles.meta?.deleted_count || 0}
               </div>
             </CardContent>
           </Card>
