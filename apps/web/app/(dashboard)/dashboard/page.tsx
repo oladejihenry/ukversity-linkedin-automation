@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const articles = await getArticles()
-  console.log(articles)
   if (!articles.data) {
     notFound()
   }
