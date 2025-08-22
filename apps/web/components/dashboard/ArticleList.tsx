@@ -13,10 +13,68 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu'
 import { Button } from '@workspace/ui/components/button'
-import { MoreVertical, Edit, Eye, Trash2, Calendar } from 'lucide-react'
+import { MoreVertical, Edit, Eye, Trash2, Calendar, PenTool, Plus, Check } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Article, PaginatedResponse } from '@/types/articles'
+import { Badge } from '@workspace/ui/components/badge'
+import { deleteArticle } from '@/lib/articles'
+import { toast } from 'sonner'
 
-export default function ArticleList() {
+interface ArticleListProps {
+  articles: PaginatedResponse<Article>
+}
+
+export default function ArticleList({ articles }: ArticleListProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const handleDeleteArticle = async (id: string) => {
+    try {
+      const response = await deleteArticle(id)
+      if (response.status === 200) {
+        toast.success('Article deleted successfully')
+        //refresh the page
+        router.refresh()
+      } else {
+        toast.error(response.message || 'Failed to delete article')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'published':
+        return 'default'
+      case 'scheduled':
+        return 'secondary'
+      case 'draft':
+        return 'outline'
+      default:
+        return 'default'
+    }
+  }
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'published':
+        return <Check className="h-4 w-4" />
+      case 'scheduled':
+        return <Calendar className="h-4 w-4" />
+      case 'draft':
+        return <PenTool className="h-4 w-4" />
+      default:
+        return <Plus className="h-4 w-4" />
+    }
+  }
+  const handleNewArticle = () => {
+    router.push('/dashboard/editor')
+  }
   return (
     <>
       <Card>
@@ -25,74 +83,85 @@ export default function ArticleList() {
           <CardDescription>Manage and organize your content</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* {articles.length === 0 ? (
-              <div className="py-12 text-center">
-                <PenTool className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                <h3 className="text-foreground mb-2 text-lg font-medium">No articles yet</h3>
-                <p className="text-muted-foreground mb-4">Start creating your first article</p>
-                <Button onClick={() => router.push('/editor')}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Article
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {articles.map((article) => (
-                  <div
-                    key={article.id}
-                    className="border-border hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition-colors"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex items-center space-x-3">
-                        <h3 className="text-foreground truncate font-medium">
-                          {article.title || 'Untitled Article'}
-                        </h3>
-                        <Badge variant={getStatusColor(article.status)}>
-                          {getStatusIcon(article.status)}
-                          {article.status}
-                        </Badge>
-                      </div>
-                      <div className="text-muted-foreground flex items-center space-x-4 text-sm">
-                        <span>Updated {formatDate(article.updatedAt)}</span>
-                        {article.publishedAt && (
-                          <span>Published {formatDate(article.publishedAt)}</span>
-                        )}
-                        {article.scheduledFor && article.status === 'scheduled' && (
-                          <span className="flex items-center">
-                            <Calendar className="mr-1 h-3 w-3" />
-                            Scheduled for {formatDate(article.scheduledFor)}
-                          </span>
-                        )}
-                      </div>
+          {articles.data.length === 0 ? (
+            <div className="py-12 text-center">
+              <PenTool className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+              <h3 className="text-foreground mb-2 text-lg font-medium">No articles yet</h3>
+              <p className="text-muted-foreground mb-4">Start creating your first article</p>
+              <Button onClick={handleNewArticle}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Article
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {articles?.data?.map((article) => (
+                <div
+                  key={article.id}
+                  className="border-border hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center space-x-3">
+                      <h3 className="text-foreground truncate font-medium">
+                        {article.title || 'Untitled Article'}
+                      </h3>
+                      <Badge variant={getStatusColor(article.status)}>
+                        {getStatusIcon(article.status)}
+                        {article.status}
+                      </Badge>
                     </div>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push(`/editor?id=${article.id}`)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        {article.status === 'published' && (
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => handleDeleteArticle(article.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="text-muted-foreground flex items-center space-x-4 text-sm">
+                      {article.status === 'published' && article.published_at && (
+                        <span className="flex items-center">
+                          Published {formatDate(article.published_at)}
+                        </span>
+                      )}
+                      {article.status === 'scheduled' && article.scheduled_for && (
+                        <span className="flex items-center">
+                          Scheduled for{' '}
+                          {new Date(article.scheduled_for).toLocaleString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )} */}
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => router.push(`/editor?id=${article.id}`)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      {article.status === 'published' && (
+                        <DropdownMenuItem>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteArticle(article.id)}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </>

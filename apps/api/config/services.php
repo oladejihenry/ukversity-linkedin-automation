@@ -35,10 +35,22 @@ return [
         ],
     ],
 
-    'linkedin' => [
-        'client_id' => env('LINKEDIN_CLIENT_ID'),
-        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
-        'redirect_uri' => env('LINKEDIN_REDIRECT_URI'),
+    'linkedin' => [    
+        'client_id' => env('LINKEDIN_CLIENT_ID'),  
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),  
+        'redirect' => env('LINKEDIN_REDIRECT_URI') 
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'base_url' => env('GEMINI_BASE_URL'),
+    ],
+
+    'heygen' => [
+        'api_key' => env('HEYGEN_API_KEY'),
+        'base_url' => env('HEYGEN_BASE_URL'),
+        'avatar_id' => env('HEYGEN_AVATAR_ID'),
+        'voice_id' => env('HEYGEN_VOICE_ID'),
     ],
 
 ];

@@ -19,10 +19,15 @@ return new class extends Migration
             $table->string('status')->default('draft');
             $table->dateTime('scheduled_for')->nullable();
             $table->timestamp('scheduled_at')->nullable();
+            $table->timestamp('published_at')->nullable();
             $table->string('linkedin_post_id')->nullable();
             $table->timestamp('linkedin_posted_at')->nullable();
             $table->text('linkedin_error_message')->nullable();
             $table->timestamp('publishing_lock_until')->nullable();
+            $table->string('video_id')->nullable();
+            $table->string('video_url')->nullable();
+            $table->string('video_status')->nullable();
+            $table->string('video_error_message')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

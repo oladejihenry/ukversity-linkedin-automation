@@ -1,13 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card'
 import ArticleList from '@/components/dashboard/ArticleList'
 import { Metadata } from 'next'
+import { getArticles } from '@/lib/articles'
+import { notFound } from 'next/navigation'
+import { Article } from '@/types/articles'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
   description: 'Dashboard',
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const articles = await getArticles()
+  if (!articles.data) {
+    notFound()
+  }
   const handleDeleteArticle = (id: string) => {
     console.log(id)
   }
@@ -23,7 +30,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {/* <div className="text-2xl font-bold">{articles.length}</div> */}
+              <div className="text-2xl font-bold">{articles.data.length}</div>
             </CardContent>
           </Card>
           <Card>
@@ -32,7 +39,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-primary text-2xl font-bold">
-                {/* {articles.filter((a) => a.status === 'published').length} */}
+                {articles.data.filter((article: Article) => article.status === 'published').length}
               </div>
             </CardContent>
           </Card>
@@ -41,25 +48,25 @@ export default function DashboardPage() {
               <CardTitle className="text-muted-foreground text-sm font-medium">Scheduled</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-accent text-2xl font-bold">
-                {/* {articles.filter((a) => a.status === 'scheduled').length} */}
+              <div className="text-2xl font-bold text-yellow-500">
+                {articles.data.filter((a: Article) => a.status === 'scheduled').length}
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-muted-foreground text-sm font-medium">Drafts</CardTitle>
+              <CardTitle className="text-muted-foreground text-sm font-medium">Deleted</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-muted-foreground text-2xl font-bold">
-                {/* {articles.filter((a) => a.status === 'draft').length} */}
+              <div className="text-2xl font-bold text-red-500">
+                {articles.data.filter((a: Article) => a.status === 'draft').length}
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Articles List */}
-        <ArticleList />
+        <ArticleList articles={articles} />
       </div>
     </main>
   )

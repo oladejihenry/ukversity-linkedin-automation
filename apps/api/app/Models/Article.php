@@ -20,6 +20,10 @@ class Article extends Model
         'linkedin_posted_at',
         'linkedin_error_message',
         'publishing_lock_until',
+        'video_status',
+        'video_url',
+        'video_id',
+        'video_error_message',
     ];
 
     protected $casts = [

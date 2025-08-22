@@ -19,6 +19,9 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
+            'linkedin_access_token' => $this->linkedin_access_token,
+            'linkedin_token_expires_at' => $this->linkedin_token_expires_at,
+            'linkedin_person_id' => $this->linkedin_person_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
+use App\Jobs\GenerateLinkedInVideo;
 use Illuminate\Http\Request;
 use App\Services\LinkedInService;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class ArticleController extends Controller
@@ -22,8 +24,8 @@ class ArticleController extends Controller
     {
         $user = $request->user();
         $articles = Article::where('user_id', $user->id)
-        ->orderBy('created_at', 'desc')
-        ->paginate(10);
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return ArticleResource::collection($articles);
     }
@@ -58,6 +60,7 @@ class ArticleController extends Controller
                 'status' => $request->status,
                 'scheduled_for' => $request->scheduled_for,
                 'scheduled_at' => $request->scheduled_at,
+                'video_status' => $request->generate_video ? 'pending' : null,
                 'user_id' => $user->id,
             ]);
 
@@ -115,6 +118,10 @@ class ArticleController extends Controller
                 }
             }
 
+            if ($request->generate_video) {
+                GenerateLinkedInVideo::dispatch($article);
+            }
+
             if ($request->status === 'scheduled' && $request->scheduled_for) {
                 Log::info('Article scheduled for LinkedIn posting', [
                     'article_id' => $article->id,
@@ -157,6 +164,13 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        //authorize the request
+        Gate::authorize('delete', $article);
+        
+        $article->delete();
+        return response()->json([
+            'message' => 'Article deleted successfully'
+
+        ], 200);
     }
 }

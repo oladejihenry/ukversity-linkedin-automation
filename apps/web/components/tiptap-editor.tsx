@@ -22,6 +22,7 @@ import {
   Redo,
 } from 'lucide-react'
 import { cn } from '@workspace/ui/lib/utils'
+import { useEffect } from 'react'
 
 interface TiptapEditorProps {
   content: string
@@ -54,6 +55,12 @@ export function TiptapEditor({
     },
   })
 
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
+
   if (!editor) {
     return null
   }
@@ -79,6 +86,12 @@ export function TiptapEditor({
       {children}
     </Button>
   )
+
+  // useEffect(() => {
+  //   if (editor && content !== editor.getHTML()) {
+  //     editor.commands.setContent(content)
+  //   }
+  // }, [content, editor])
 
   return (
     <div className="border-border bg-card overflow-hidden rounded-lg border">
