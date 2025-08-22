@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 import { Article } from '@/types/articles'
 
 export const metadata: Metadata = {
-  title: 'Dashboard',
+  title: 'Dashboard | UkVersity',
   description: 'Dashboard',
 }
 
