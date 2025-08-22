@@ -4,6 +4,8 @@ import { Metadata } from 'next'
 import { getArticles } from '@/lib/articles'
 import { notFound } from 'next/navigation'
 import { Article } from '@/types/articles'
+import { Suspense } from 'react'
+import { ArticleListSkeleton } from '@/components/skeletons/ArticleListSkeleton'
 
 export const metadata: Metadata = {
   title: 'Dashboard | UkVersity',
@@ -67,7 +69,9 @@ export default async function DashboardPage() {
         </div>
 
         {/* Articles List */}
-        <ArticleList articles={articles} />
+        <Suspense fallback={<ArticleListSkeleton />}>
+          <ArticleList articles={articles} />
+        </Suspense>
       </div>
     </main>
   )

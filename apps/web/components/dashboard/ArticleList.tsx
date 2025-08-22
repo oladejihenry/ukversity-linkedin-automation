@@ -19,6 +19,7 @@ import { Article, PaginatedResponse } from '@/types/articles'
 import { Badge } from '@workspace/ui/components/badge'
 import { deleteArticle } from '@/lib/articles'
 import { toast } from 'sonner'
+import { Separator } from '@workspace/ui/components/separator'
 
 interface ArticleListProps {
   articles: PaginatedResponse<Article>
@@ -139,16 +140,14 @@ export default function ArticleList({ articles }: ArticleListProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => router.push(`/editor?id=${article.id}`)}>
+                      <DropdownMenuItem
+                        onClick={() => router.push(`/editor?id=${article.id}`)}
+                        className="cursor-pointer"
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      {article.status === 'published' && (
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-                      )}
+                      <Separator className="my-1" />
                       <DropdownMenuItem
                         onClick={() => handleDeleteArticle(article.id)}
                         className="cursor-pointer"
