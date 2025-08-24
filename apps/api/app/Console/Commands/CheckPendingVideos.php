@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Article;
+use App\Notifications\VideoGenerationCompleted;
 use App\Services\VideoGenerationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +37,8 @@ class CheckPendingVideos extends Command
                         'video_status' => 'completed',
                         'video_error_message' => null
                     ]);
+
+                    $article->user->notify(new VideoGenerationCompleted($article));
 
                     Log::info('Video processing completed', [
                         'article_id' => $article->id,

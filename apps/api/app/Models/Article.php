@@ -21,6 +21,7 @@ class Article extends Model
         'linkedin_error_message',
         'publishing_lock_until',
         'video_status',
+        'published_at',
         'video_url',
         'video_id',
         'video_error_message',

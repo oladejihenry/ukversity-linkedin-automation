@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Article;
+use App\Notifications\ArticlePublishedOnLinkedIn;
 use App\Services\LinkedInService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -77,6 +78,8 @@ class PostArticleToLinkedIn implements ShouldQueue
                     'linkedin_error_message' => null,
                     'published_at' => now()
                 ]);
+
+                $this->article->user->notify(new ArticlePublishedOnLinkedIn($this->article));
 
                 Log::info('Successfully posted scheduled article to LinkedIn', [
                     'article_id' => $this->article->id,
